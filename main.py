@@ -1,39 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, CORSMiddleware
 import uvicorn
+from routers import users
+from routers import journal
+from routers import analysis
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-#Get Journal Entries
-@app.get("/journal")
-def read_root():
-    return {"message": "Hello, World!"}
-#Add Journal Entry
-@app.post("/journal")
-def read_root():
-    return {"message": "Hello, World!"}
-
-#Get Advice
-@app.get("/advice")
-def read_root():
-    return {"message": "Hello, World!"}
-
-#Add Advice
-@app.post("/advice")
-def read_root():
-    return {"message": "Hello, World!"}
-
-#Get Mood Analysis with sentimental analysis From Journal Entries
-@app.get("/mood-analysis")
-def read_root():
-    return {"message": "Hello, World!"}
-
-# Get Stress Analysis from journal entries
-@app.get("/stress-analysis")
-def read_root():
-    return {"message": "Hello, World!"}
-
-
+app.include_router(users.router)
+app.include_router(journal.router)
+app.include_router(analysis.router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
