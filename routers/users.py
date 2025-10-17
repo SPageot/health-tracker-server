@@ -1,27 +1,28 @@
 from fastapi import APIRouter
+from ..models.usermodels import User, NewUser
 
 router = APIRouter()
 
 @router.get("/{user_id}", tags=["users"])
-def get_users(user_id: int):
+def get_user(user_id: int):
     return {"message": "Hello, World!"}
 
 #Login User
 @router.post("/login-user",tags=["users"])
-def login_user(username: str, password: str):
+def login_user(user: User):
     return {"message": "Hello, World!"}
 
 #Register User
 @router.post("/register-user", tags=["users"])
-def register_user(username: str, password: str):
+def register_user(new_user: NewUser):
     return {"message": "Hello, World!"}
 
 #Delete User
-@router.delete("/delete-user", tags=["users"])
-def delete_user(username: str):
+@router.delete("/{user_id}", tags=["users"])
+def delete_user(user_id: int):
     return {"message": "Hello, World!"}
 
 #Update User
-@router.put("/update-user", tags=["users"])
-def update_user(username: str, password: str):
+@router.put("/{user_id}", tags=["users"])
+def update_user(user: User):
     return {"message": "Hello, World!"}
