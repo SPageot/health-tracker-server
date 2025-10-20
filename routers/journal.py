@@ -1,44 +1,35 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from ..models.journalmodels import JournalEntry
+from ..security.ratelimit import limiter
 router = APIRouter()
 
 
 #Get All Journal Entries
 @router.get("/", tags=["journal"])
-def get_all_journal_entries():
+@limiter.limit("5/minute")
+def get_all_journal_entries(request: Request):
     return {"message": "Hello, World!!!"}
 
 #Get Journal Entry
 @router.get("/{journal_id}", tags=["journal"])
-def get_journal_entry(journal_id: int):
+@limiter.limit("5/minute")
+def get_journal_entry(request: Request, journal_id: int):
     return {"message": "Hello, World!"}
 
 #Add Journal Entry
 @router.post("/entry", tags=["journal"])
-def add_journal_entry(entry: JournalEntry):
+@limiter.limit("5/minute")
+def add_journal_entry(request: Request, entry: JournalEntry):
     return {"message": "Hello, World!"}
 
 #Delete Journal Entry
 @router.delete("/{journal_id}", tags=["journal"])
-def delete_journal_entry(journal_id: int):
+@limiter.limit("5/minute")
+def delete_journal_entry(request: Request, journal_id: int):
     return {"message": "Hello, World!"}
 
 #Update Journal Entry
 @router.put("/{journal_id}", tags=["journal"])
-def update_journal_entry(journal_id: int, entry: JournalEntry):
-    return {"message": "Hello, World!"}
-
-#Get Advice
-@router.get("/advice")
-def get_advice():
-    return {"message": "Hello, World!"}
-
-#Get Mood Analysis with sentimental analysis From Journal Entries
-@router.get("/mood-analysis")
-def get_mood_analysis():
-    return {"message": "Hello, World!"}
-
-# Get Stress Analysis from journal entries
-@router.get("/stress-analysis")
-def get_stress_analysis():
+@limiter.limit("5/minute")
+def update_journal_entry(request: Request, journal_id: int, entry: JournalEntry):
     return {"message": "Hello, World!"}
