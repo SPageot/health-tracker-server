@@ -22,8 +22,10 @@ async def get_user(request:Request, user_id: uuid.UUID):
 @router.post("/login-user",tags=["users"])
 @limiter.limit("5/minute")
 def login_user(request:Request, user: User):
-    print(user);
-    return {"message": "Hello, World!"}
+    with Session(engine) as session:
+        statement = select(UserDB).where(UserDB.username == user.username and UserDB.password == user.password)
+        results = session.exec(statement).all()
+        return results
 
 #Register User
 @router.post("/register-user", tags=["users"])
