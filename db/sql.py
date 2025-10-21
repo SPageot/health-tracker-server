@@ -1,7 +1,6 @@
 from sqlmodel import SQLModel, create_engine
+from ..config import settings
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:St%40nley1985@localhost:5432/self-care-journal"
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+engine = create_engine(settings.db_url, echo=True)
 
 SQLModel.metadata.create_all(engine)

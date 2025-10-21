@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from ..security.ratelimit import limiter
 from ..models.usermodels import User, NewUser
 from sqlmodel import Session, select
-from db.sql import engine
+from ..db.sql import engine
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST
 from ..schema.user import NewUserDB, UserDB
