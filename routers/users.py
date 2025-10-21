@@ -19,9 +19,10 @@ async def get_user(request:Request, user_id: uuid.UUID):
         return results
 
 #Login User
+#TODO:ADD AUTH TOKEN
 @router.post("/login-user",tags=["users"])
 @limiter.limit("5/minute")
-def login_user(request:Request, user: User):
+async def login_user(request:Request, user: User):
     with Session(engine) as session:
         statement = select(UserDB).where(UserDB.username == user.username and UserDB.password == user.password)
         results = session.exec(statement).all()
@@ -30,13 +31,23 @@ def login_user(request:Request, user: User):
 #Register User
 @router.post("/register-user", tags=["users"])
 @limiter.limit("5/minute")
-def register_user(request:Request, new_user: NewUser):
-    return {"message": "Hello, World!"}
+async def register_user(request:Request, new_user: NewUser):
+    with Session(engine) as session:
+        for key in new_user:
+            value = new_user[key]
+            if value == "" or value is None:
+                if key == "id":
+                    continue
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"Missing required field: {key}")
+    with Session(engine) as session:
+        session.add(NewUser(**new_user))
+        session.commit()
+    return new_user
 
 #Delete User
 @router.delete("/{user_id}", tags=["users"])
 @limiter.limit("5/minute")
-def delete_user(request:Request, user_id: uuid.UUID):
+async def delete_user(request:Request, user_id: uuid.UUID):
     with Session(engine) as session:
         item = session.get(NewUserDB, user_id)
         if item is None:
