@@ -1,18 +1,28 @@
 from fastapi import APIRouter, Request
 from ..security.ratelimit import limiter
 from ..models.usermodels import User, NewUser
+from sqlmodel import Session, select
+from db.sql import engine
+from fastapi.exceptions import HTTPException
+from starlette.status import HTTP_400_BAD_REQUEST
+from ..schema.user import NewUserDB, UserDB
+import uuid
 
 router = APIRouter()
 
 @router.get("/{user_id}", tags=["users"])
 @limiter.limit("5/minute")
-def get_user(request:Request, user_id: int):
-    return {"message": "Hello, World!"}
+async def get_user(request:Request, user_id: uuid.UUID):
+   with Session(engine) as session:
+        statement = select(NewUserDB).where(NewUserDB.id == user_id)
+        results = session.exec(statement).all()
+        return results
 
 #Login User
 @router.post("/login-user",tags=["users"])
 @limiter.limit("5/minute")
 def login_user(request:Request, user: User):
+    print(user);
     return {"message": "Hello, World!"}
 
 #Register User
@@ -24,8 +34,14 @@ def register_user(request:Request, new_user: NewUser):
 #Delete User
 @router.delete("/{user_id}", tags=["users"])
 @limiter.limit("5/minute")
-def delete_user(request:Request, user_id: int):
-    return {"message": "Hello, World!"}
+def delete_user(request:Request, user_id: uuid.UUID):
+    with Session(engine) as session:
+        item = session.get(NewUserDB, user_id)
+        if item is None:
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="User not found")
+        session.delete(item)
+        session.commit()
+    return {"message": "User deleted successfully"}
 
 #Update User
 @router.put("/{user_id}", tags=["users"])

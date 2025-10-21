@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request
 from ..models.journalmodels import JournalEntry
 from ..security.ratelimit import limiter
+import uuid
 router = APIRouter()
 
 
@@ -13,7 +14,7 @@ def get_all_journal_entries(request: Request):
 #Get Journal Entry
 @router.get("/{journal_id}", tags=["journal"])
 @limiter.limit("5/minute")
-def get_journal_entry(request: Request, journal_id: int):
+def get_journal_entry(request: Request, journal_id: uuid.UUID):
     return {"message": "Hello, World!"}
 
 #Add Journal Entry
@@ -25,7 +26,7 @@ def add_journal_entry(request: Request, entry: JournalEntry):
 #Delete Journal Entry
 @router.delete("/{journal_id}", tags=["journal"])
 @limiter.limit("5/minute")
-def delete_journal_entry(request: Request, journal_id: int):
+def delete_journal_entry(request: Request, journal_id: uuid.UUID):
     return {"message": "Hello, World!"}
 
 #Update Journal Entry

@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class User(BaseModel):
-    username: str = ""
-    password: str = ""
+    username: str
+    password: str
     
 
 class NewUser(User):
