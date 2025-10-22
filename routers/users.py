@@ -33,14 +33,16 @@ async def login_user(request:Request, user: User):
 @limiter.limit("5/minute")
 async def register_user(request:Request, new_user: NewUser):
     with Session(engine) as session:
+        print(type(new_user))
         for key in new_user:
-            value = new_user[key]
+            value = key[1]
+            print(value)
             if value == "" or value is None:
                 if key == "id":
                     continue
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"Missing required field: {key}")
     with Session(engine) as session:
-        session.add(NewUser(**new_user))
+        session.add(NewUserDB(**new_user))
         session.commit()
     return new_user
 
