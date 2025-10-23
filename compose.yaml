@@ -1,10 +1,30 @@
 services:
-  app:
+  db:
+    image: postgres:15
+    container_name: health_tracker_db
+    restart: always
+    environment:
+      POSTGRES_USER: stanleypageot
+      POSTGRES_PASSWORD: add
+      POSTGRES_DB: app_db
+    ports:
+      - "5431:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: python-app
+    container_name: healther_tracker
     volumes:
       - .:/app
     ports:
       - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://stanleypageot:stanleypageot@db:5432/app_db
+
+volumes:
+  postgres_data:

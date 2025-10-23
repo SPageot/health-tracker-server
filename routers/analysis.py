@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from ..security.ratelimit import limiter
+from security.ratelimit import limiter
 
 router = APIRouter();
 

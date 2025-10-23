@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
-from ..models.journalmodels import JournalEntry
-from ..security.ratelimit import limiter
+from models.journalmodels import JournalEntry
+from security.ratelimit import limiter
 import uuid
 router = APIRouter()
 

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Request
-from ..security.ratelimit import limiter
-from ..models.usermodels import User, NewUser
+from security.ratelimit import limiter
+from models.usermodels import User, NewUser
 from sqlmodel import Session, select
-from ..db.sql import engine
+from db.sql import engine
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST
-from ..schema.user import NewUserDB, UserDB
+from schema.user import Users, UserDB
 import uuid
 
 router = APIRouter()
@@ -14,7 +14,7 @@ router = APIRouter()
 @limiter.limit("5/minute")
 async def get_user(request:Request, user_id: uuid.UUID):
    with Session(engine) as session:
-        statement = select(NewUserDB).where(NewUserDB.id == user_id)
+        statement = select(UserDB).where(UserDB.id == user_id)
         results = session.exec(statement).all()
         return results
 
@@ -31,18 +31,16 @@ async def login_user(request:Request, user: User):
 #Register User
 @router.post("/register-user", tags=["users"])
 @limiter.limit("5/minute")
-async def register_user(request:Request, new_user: NewUser):
+async def register_user(request:Request, new_user: Users):
     with Session(engine) as session:
         print(type(new_user))
         for key in new_user:
             value = key[1]
             print(value)
             if value == "" or value is None:
-                if key == "id":
-                    continue
-            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"Missing required field: {key}")
+                raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=f"Missing required field: {key}")
     with Session(engine) as session:
-        session.add(NewUserDB(**new_user))
+        session.add(Users(**dict(new_user)))
         session.commit()
     return new_user
 

@@ -10,8 +10,8 @@ class UserDB(SQLModel, table=True):
     password: str
     
 
-class NewUserDB(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+class Users(SQLModel, table=True):
+    id: UUID | None = Field(default_factory=uuid.uuid4, primary_key=True)
     username: str
     password: str
     email: str = Field(default="", index=True)
