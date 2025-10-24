@@ -1,13 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 import uuid
-from sqlmodel import Field, SQLModel, table
-
-
-class UserDB(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    username: str
-    password: str
+from sqlmodel import Field, SQLModel
     
 
 class Users(SQLModel, table=True):

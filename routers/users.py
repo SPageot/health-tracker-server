@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Request
 from security.ratelimit import limiter
-from models.usermodels import User, NewUser
 from sqlmodel import Session, select
 from db.sql import engine
 from fastapi.exceptions import HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST
-from schema.user import Users, UserDB
+from schema.user import Users
 import uuid
 
 router = APIRouter()
@@ -14,7 +13,7 @@ router = APIRouter()
 @limiter.limit("5/minute")
 async def get_user(request:Request, user_id: uuid.UUID):
    with Session(engine) as session:
-        statement = select(UserDB).where(UserDB.id == user_id)
+        statement = select(Users).where(Users.id == user_id)
         results = session.exec(statement).all()
         return results
 
@@ -22,9 +21,9 @@ async def get_user(request:Request, user_id: uuid.UUID):
 #TODO:ADD AUTH TOKEN
 @router.post("/login-user",tags=["users"])
 @limiter.limit("5/minute")
-async def login_user(request:Request, user: User):
+async def login_user(request:Request, user: Users):
     with Session(engine) as session:
-        statement = select(UserDB).where(UserDB.username == user.username and UserDB.password == user.password)
+        statement = select(Users).where(Users.username == user.username and Users.password == user.password)
         results = session.exec(statement).all()
         return results
 
@@ -49,7 +48,7 @@ async def register_user(request:Request, new_user: Users):
 @limiter.limit("5/minute")
 async def delete_user(request:Request, user_id: uuid.UUID):
     with Session(engine) as session:
-        item = session.get(NewUserDB, user_id)
+        item = session.get(Users, user_id)
         if item is None:
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="User not found")
         session.delete(item)
@@ -59,5 +58,12 @@ async def delete_user(request:Request, user_id: uuid.UUID):
 #Update User
 @router.put("/{user_id}", tags=["users"])
 @limiter.limit("5/minute")
-def update_user(request:Request, user: User):
-    return {"message": "Hello, World!"}
+def update_user(request:Request,user_id:uuid.UUID, user: Users):
+    with Session(engine) as session:
+        item = session.get(Users, user_id)
+        print(item)
+        if item is None:
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="User not found")
+        item.sqlmodel_update(user)
+        session.commit()
+    return session
